@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: master
+    branches: dev
  
 jobs:
   build-and-push-DEV:
@@ -35,29 +35,3 @@ jobs:
         publish-profile: ${{ secrets.DEPLOYMENT_DEV }}
         package: './dotnetcorewebapp'
 
-  build-and-push-PROD:
-    needs: [build-and-push-DEV]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Check output
-        run: echo ${{ steps.vars.outputs.short_ref }}
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: dotnet publish
-      run: |
-        dotnet publish -c Release -o dotnetcorewebapp
-    - name: 'Deploy to Azure WebApp'
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: prodtestingdotnet
-        publish-profile: ${{ secrets.DEPLOY_PROD }}
-        package: './dotnetcorewebapp'
